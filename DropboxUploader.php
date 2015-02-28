@@ -256,9 +256,12 @@ final class DropboxUploader {
 
     private function extractTokenFromLoginForm($html) {
         // , "TOKEN": "gCvxU6JVukrW0CUndRPruFvY",
-        if (!preg_match('#, "TOKEN": "([A-Za-z0-9_-]+)", #', $html, $matches))
+        // or
+        // <input type="hidden" name="t" value="gCvxU6JVukrW0CUndRPruFvY" />
+        $pattern = '#, "TOKEN": "([A-Za-z0-9_-]+)", |<input type="hidden" name="t" value="([A-Za-z0-9_-]+)" />#';
+        if (!preg_match($pattern, $html, $matches))
             throw new Exception('Cannot extract login CSRF token.', self::CODE_SCRAPING_LOGIN);
-        return $matches[1];
+        return $matches[1] ? $matches[1] : $matches[2];
     }
 
     public function __destruct() {
